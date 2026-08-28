@@ -1,0 +1,6 @@
+{
+  "name": "SIAO Zulia - Sistema Comunal",
+  "description": "Sistema de Información Automatizado para Consejos Comunales en el Estado Zulia. Optimización administrativa, logística, seguimiento de tiempo y registro con validación de datos.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

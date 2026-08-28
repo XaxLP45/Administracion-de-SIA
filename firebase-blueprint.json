@@ -1,0 +1,199 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User account data for communal council operators in Zulia State.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "format": "email" },
+        "nombre": { "type": "string" },
+        "apellido": { "type": "string" },
+        "cedula": { "type": "string" },
+        "edad": { "type": "integer" },
+        "telefono": { "type": "string" },
+        "municipio": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "nombre", "apellido", "cedula", "edad", "telefono", "municipio", "role", "createdAt", "updatedAt"]
+    },
+    "Session": {
+      "title": "User Session",
+      "description": "Log of user login/logout times for supervision and optimization.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "loginAt": { "type": "string", "format": "date-time" },
+        "logoutAt": { "type": "string", "format": "date-time" },
+        "durationSeconds": { "type": "integer" },
+        "date": { "type": "string", "description": "YYYY-MM-DD" }
+      },
+      "required": ["userId", "loginAt", "date"]
+    },
+    "SearchActivity": {
+      "title": "Search Activity",
+      "description": "Log of searches performed by users to track interest and activity.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "query": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "query", "timestamp"]
+    },
+    "CalendarEvent": {
+      "title": "Logistics Calendar Event",
+      "description": "Events and activities for logistics management, can be starred as managed tasks.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "description": { "type": "string" },
+        "isStarred": { "type": "boolean" },
+        "starType": { "type": "string", "enum": ["none", "permanent", "temporary_day", "temporary_hour"] },
+        "starredAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "date", "isStarred"]
+    },
+    "UserFile": {
+      "title": "User Personal File",
+      "description": "Personal files stored in the profile (Photos, Works, Projects) including trash state.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["photo", "work", "project", "media"] },
+        "status": { "type": "string", "enum": ["active", "trash"] },
+        "mimeType": { "type": "string" },
+        "size": { "type": "integer", "description": "Size in bytes" },
+        "data": { "type": "string", "description": "Base64 data or reference" },
+        "isPurpleStarred": { "type": "boolean", "description": "True if cannot be deleted" },
+        "deletedAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "type", "mimeType", "size", "data"]
+    },
+    "StorageUsage": {
+      "title": "User Storage Usage",
+      "description": "Total storage used by a user.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "totalBytes": { "type": "integer" }
+      },
+      "required": ["userId", "totalBytes"]
+    },
+    "CommunityInfo": {
+      "title": "Community Information Article",
+      "description": "Information and documents maintained by administrators with images and descriptions.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "category": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "sector": { "type": "string" },
+        "authorName": { "type": "string" },
+        "authorId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "content", "category", "authorId", "createdAt"]
+    },
+    "ApprovedProposalNews": {
+      "title": "Approved Proposal Announcement",
+      "description": "Public notice of community proposals approved after review/voting.",
+      "type": "object",
+      "properties": {
+        "proposalId": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "category": { "type": "string" },
+        "sector": { "type": "string" },
+        "authorName": { "type": "string" },
+        "votesFor": { "type": "integer" },
+        "votesAgainst": { "type": "integer" },
+        "approvedAt": { "type": "string", "format": "date-time" },
+        "votingEndedAt": { "type": "string", "format": "date-time" },
+        "approvedByName": { "type": "string" }
+      },
+      "required": ["proposalId", "title", "description", "category", "approvedAt"]
+    },
+    "AccountRecoveryRequest": {
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "cedula": { "type": "string" },
+        "contactPhone": { "type": "string" },
+        "municipio": { "type": "string" },
+        "type": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userEmail", "userName", "type", "message", "status"]
+    },
+    "PhoneVerificationCode": {
+      "type": "object",
+      "properties": {
+        "phone": { "type": "string" },
+        "code": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userId": { "type": "string" },
+        "userName": { "type": "string" },
+        "used": { "type": "boolean" },
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["phone", "code", "used"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Individual user profile documents."
+    },
+    "/account_recovery_requests/{requestId}": {
+      "schema": "AccountRecoveryRequest",
+      "description": "Account recovery and support tickets submitted by users."
+    },
+    "/phone_verification_codes/{codeId}": {
+      "schema": "PhoneVerificationCode",
+      "description": "OTP codes sent to phone numbers for password recovery."
+    },
+    "/sessions/{sessionId}": {
+      "schema": "Session",
+      "description": "Time tracking sessions for users."
+    },
+    "/search_activities/{activityId}": {
+      "schema": "SearchActivity",
+      "description": "History of user search queries."
+    },
+    "/calendar_events/{eventId}": {
+      "schema": "CalendarEvent",
+      "description": "Logistics and company events with starring feature."
+    },
+    "/user_files/{fileId}": {
+      "schema": "UserFile",
+      "description": "Personal user files for photos, works, and projects."
+    },
+    "/storage_usage/{userId}": {
+      "schema": "StorageUsage",
+      "description": "Tracks total storage consumed by each user."
+    },
+    "/community_info/{infoId}": {
+      "schema": "CommunityInfo",
+      "description": "Information articles and community records managed by administrators."
+    },
+    "/approved_proposals_news/{newsId}": {
+      "schema": "ApprovedProposalNews",
+      "description": "Announcements of accepted community proposals."
+    }
+  }
+}

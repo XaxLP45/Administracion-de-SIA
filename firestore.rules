@@ -1,0 +1,163 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 0. Default Deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helpers ---
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+    function incoming() { return request.resource.data; }
+    function existing() { return resource.data; }
+    function isValidId(id) { return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); }
+    function isVerified() { return request.auth.token.email_verified == true; }
+
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'email', 'nombre', 'apellido', 'cedula', 'edad', 'telefono', 'municipio', 'role', 'createdAt', 'updatedAt'])
+        && data.keys().size() == 11
+        && data.uid == request.auth.uid
+        && data.cedula is string && data.cedula.size() >= 4 && data.cedula.size() <= 25
+        && data.nombre is string && data.nombre.size() > 0 && data.nombre.size() <= 60
+        && data.edad is int && data.edad >= 18 && data.edad <= 125
+        && data.role in ['user', 'admin']
+        && data.createdAt == request.time
+        && data.updatedAt == request.time;
+    }
+
+    function isValidSession(data) {
+      return data.keys().hasAll(['userId', 'loginAt', 'date'])
+        && data.userId == request.auth.uid
+        && data.loginAt == request.time
+        && data.date is string && data.date.size() == 10;
+    }
+
+    function isValidAudit(data) {
+      return data.keys().hasAll(['userId', 'changes', 'changedAt'])
+        && data.keys().size() == 3
+        && data.userId == request.auth.uid
+        && data.changes is list
+        && data.changedAt == request.time;
+    }
+
+    function isValidSearch(data) {
+      return data.keys().hasAll(['userId', 'query', 'timestamp'])
+        && data.keys().size() == 3
+        && data.userId == request.auth.uid
+        && data.query is string
+        && data.timestamp == request.time;
+    }
+
+    function isValidEvent(data) {
+      return data.keys().hasAll(['userId', 'title', 'date', 'isStarred'])
+        && data.userId == request.auth.uid
+        && data.title is string
+        && data.date is string
+        && data.isStarred is bool
+        && (data.get('starType', 'none') in ['none', 'permanent', 'temporary_day', 'temporary_hour'])
+        && (data.get('createdAt', request.time) == request.time || data.createdAt is timestamp);
+    }
+
+    // --- Rules ---
+
+    // USERS Collection and Subcollections (Friends, etc.)
+    match /users/{userId} {
+      allow get, list: if true;
+      allow create, update, delete: if isSignedIn();
+    }
+    match /users/{userId}/{document=**} {
+      allow read, write: if isSignedIn();
+    }
+
+    // SEARCH ACTIVITIES Collection
+    match /search_activities/{activityId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // CALENDAR EVENTS Collection
+    match /calendar_events/{eventId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // USER FILES Collection
+    match /user_files/{fileId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // STORAGE USAGE Collection
+    match /storage_usage/{userId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // PROFILE AUDITS Collection
+    match /profile_audits/{auditId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // SESSIONS Collection
+    match /sessions/{sessionId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // NEWS (Noticias de Administradores y Desarrolladores) Collection
+    match /news/{newsId} {
+      allow read, write: if true;
+    }
+
+    // PROPOSALS (Propuestas Comunales y de Desarrollo) Collection
+    match /proposals/{proposalId} {
+      allow read, write: if true;
+    }
+
+    // DELETED PROPOSALS (Papelera temporal de 10 días para Administradores)
+    match /deleted_proposals/{proposalId} {
+      allow read, write: if true;
+    }
+
+    // PROPOSAL VOTES Collection
+    match /proposal_votes/{voteId} {
+      allow read, write: if true;
+    }
+
+    // CHAT GROUPS Collection
+    match /chat_groups/{groupId} {
+      allow read, write: if true;
+    }
+
+    // COMMUNITY CHAT MESSAGES Collection
+    match /community_chat_messages/{messageId} {
+      allow read, write: if true;
+    }
+
+    // COMMUNITY INFO (Buscar Información)
+    match /community_info/{infoId} {
+      allow read, write: if true;
+    }
+
+    // MISIÓN SUCRE POSTS & ANNOUNCEMENTS Collection
+    match /mision_sucre_posts/{postId} {
+      allow read, write: if true;
+    }
+
+    // ADMIN DELETED NEWS BLACKLIST Collection
+    match /admin_deleted_news/{deletedId} {
+      allow read, write: if true;
+    }
+
+    // ACCOUNT & CONVERSATION RECOVERY REQUESTS Collection
+    match /account_recovery_requests/{requestId} {
+      allow read, write: if true;
+    }
+
+    // PHONE VERIFICATION CODES (Códigos OTP de recuperación de contraseña por teléfono)
+    match /phone_verification_codes/{codeId} {
+      allow read, write: if true;
+    }
+
+    // APPROVED PROPOSALS NEWS (Casilla de Noticias de Propuestas Aprobadas)
+    match /approved_proposals_news/{newsId} {
+      allow read, write: if true;
+    }
+  }
+}
